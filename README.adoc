@@ -106,6 +106,14 @@ commit: 54f28ac5d3a815d1196cd5d57d707439ee4bb392
 ----
 
 ==== Start Minikube
+*Note:* As I'll be running `Istio` along with my applications, one needs more memory and CPU than you get by default. Here are some recommended settings:
+----
+$ minikube config set cpus 4
+$ minikube config set memory 8192
+$ minikube config set disk-size 50g
+$ minikube addons enable ingress
+----
+
 With all the required packages are installed. You can now start Minikube with the following command:
 ----
 $ minikube start
@@ -220,3 +228,71 @@ You can also stop and delete kubernetes cluster anytime with the following comma
 $ minikube stop
 $ minikube delete
 ----
+
+==== Access Kubernetes Dashboard
+By default, Kubernetes comes with web dashboard that can be used to manage your cluster.
+You can list all the minikube addons with the following command:
+
+----
+$ minikube addons list
+----
+
+You should see the following output:
+----
+- addon-manager: enabled
+- dashboard: disabled
+- default-storageclass: enabled
+- efk: disabled
+- freshpod: disabled
+- gvisor: disabled
+- helm-tiller: disabled
+- ingress: disabled
+- ingress-dns: disabled
+- logviewer: disabled
+- metrics-server: disabled
+- nvidia-driver-installer: disabled
+- nvidia-gpu-device-plugin: disabled
+- registry: disabled
+- registry-creds: disabled
+- storage-provisioner: enabled
+- storage-provisioner-gluster: disabled
+----
+
+Next, list all the container image running in the cluster with the following command:
+----
+kubectl get pods --all-namespaces
+----
+
+You should see the following output:
+----
+NAMESPACE     NAME                                        READY   STATUS    RESTARTS   AGE
+kube-system   coredns-6955765f44-pjzdd                    1/1     Running   0          42s
+kube-system   coredns-6955765f44-q7zcd                    1/1     Running   0          42s
+kube-system   etcd-minikube                               1/1     Running   0          48s
+kube-system   kube-addon-manager-minikube                 1/1     Running   0          48s
+kube-system   kube-apiserver-minikube                     1/1     Running   0          48s
+kube-system   kube-controller-manager-minikube            1/1     Running   0          48s
+kube-system   kube-proxy-2lvq8                            1/1     Running   0          42s
+kube-system   kube-scheduler-minikube                     1/1     Running   0          47s
+kube-system   nginx-ingress-controller-6fc5bcc8c9-4pnnn   1/1     Running   0          40s
+kube-system   storage-provisioner                         1/1     Running   0          41s
+----
+
+Now, run the following command to get the URL of the kubernetes dashboard:
+----
+minikube dashboard --url
+----
+
+You should see the following output:
+----
+🔌  Enabling dashboard ...
+🤔  Verifying dashboard health ...
+🚀  Launching proxy ...
+🤔  Verifying proxy health ...
+http://127.0.0.1:34897/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/
+----
+
+Your Minikube web url is now generated. Next, open your web browser and type the URL `http://127.0.0.1:34897/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/`. You will be redirected to the Kubernetes dashboard as shown in the following page:
+image:./readme-resources/kubernetes-dashboard.png[kubernetes-dashboard]
+
+You can now easily manage your Kubernetes cluster through your web browser.
