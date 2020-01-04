@@ -18,3 +18,46 @@ snap install kubectl --classic
 
 kubectl version
 ----
+
+===== Install MiniKube
+
+One first needs to check if virtualization is supported on their Linux distro. Run the following command and verify that the output is non-empty:
+----
+$ grep -E --color 'vmx|svm' /proc/cpuinfo
+----
+
+Verify that `kubectl` was installed correctly
+
+===== Install a Hypervisor
+* Update your system with the latest version. You can do this by running the following commands:
+----
+$ sudo apt-get update -y
+$ sudo apt-get upgrade -y
+----
+* Next, install some required packages with the following command:
+----
+$ sudo apt-get install curl wget apt-transport-https -y
+----
+* Follow the process below to install latest version of VirtualBox.
+
+** Add Oracle VirtualBox’s repository to your list of repositories. You add its GPG key so that your system trusts this repository. Now when you install VirtualBox, it will be installed from Oracle’s repository instead of Ubuntu’s repository. If there is a new version released, VirtualBox install will be updated along with the system updates.
+
+*** First, add the key for the repository, using the following command:
+----
+$ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+----
+
+** Now add the Oracle VirtualBox repository to the list of repositories using this command:
+----
+$ sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib"
+----
+
+** Type `sudo apt install virtualbox–` and hit tab to see the various VirtualBox versions available for installation and then select one of them by typing it completely.
+----
+$ sudo apt update && sudo apt install virtualbox-6.1
+----
+
+** Use the command below if you need to `remove` VirtualBox from Ubuntu
+----
+$ sudo apt remove virtualbox virtualbox-*
+----
