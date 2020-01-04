@@ -296,3 +296,96 @@ Your Minikube web url is now generated. Next, open your web browser and type the
 image:./readme-resources/kubernetes-dashboard.png[kubernetes-dashboard]
 
 You can now easily manage your Kubernetes cluster through your web browser.
+
+*Note:* Minikube comes with it’s own Docker daemon, so that you don’t have to use Docker Desktop. You only need the ‘docker’ CLI and point it to Minikube:
+----
+$ eval $(minikube docker-env)
+----
+
+==== Istio Installation
+Download Istio into your preferred location using the following command:
+----
+$ curl -L https://git.io/getLatestIstio | sh -
+----
+Follow the instructions in the terminal to set the path.
+
+
+To configure the istioctl client tool for your workstation,
+add the `/<PATH TO ISTIO DIRECTORY>/istio-1.4.2/bin` directory to your environment path variable with:
+
+----
+$ cd `/<PATH TO ISTIO DIRECTORY>/istio-1.4.2`
+$ export PATH=$PWD/bin:$PATH
+----
+
+Ensure `minikube` is started and running
+
+Begin the Istio pre-installation verification check by running:
+----
+$ istioctl verify-install
+----
+
+If all is well, you should get the following output:
+----
+Checking the cluster to make sure it is ready for Istio installation...
+
+#1. Kubernetes-api
+-----------------------
+Can initialize the Kubernetes client.
+Can query the Kubernetes API Server.
+
+#2. Kubernetes-version
+-----------------------
+Istio is compatible with Kubernetes: v1.17.0.
+
+#3. Istio-existence
+-----------------------
+Istio will be installed in the istio-system namespace.
+
+#4. Kubernetes-setup
+-----------------------
+Can create necessary Kubernetes configurations: Namespace,ClusterRole,ClusterRoleBinding,CustomResourceDefinition,Role,ServiceAccount,Service,Deployments,ConfigMap.
+
+#5. SideCar-Injector
+-----------------------
+This Kubernetes cluster supports automatic sidecar injection. To enable automatic sidecar injection see https://istio.io/docs/setup/kubernetes/additional-setup/sidecar-injection/#deploying-an-app
+
+-----------------------
+Install Pre-Check passed! The cluster is ready for Istio installation.
+----
+
+To install Istio, run these commands:
+----
+$ cd /<PATH TO ISTIO DIRECTORY>/istio-1.4.2/
+$ kubectl apply -f install/kubernetes/helm/istio-init/files
+$ kubectl apply -f install/kubernetes/istio-demo.yaml
+----
+
+Make sure that all pods are running or completed before continuing. This can take several minutes when starting the pods for the first time. Be patient.
+----
+$ kubectl get pod -n istio-system
+----
+
+The output of the above command should show all Istio pods either `running` or `completed` before you move on.
+----
+NAME                                      READY   STATUS      RESTARTS   AGE
+grafana-7797c87688-5j56c                  1/1     Running     0          3m22s
+istio-citadel-65c9f49c76-xs66z            1/1     Running     0          3m21s
+istio-egressgateway-5b6cbd4c96-sgxsh      1/1     Running     0          3m22s
+istio-galley-c5cb9c77d-s52rl              1/1     Running     0          3m22s
+istio-grafana-post-install-1.4.2-nnfmk    0/1     Completed   0          3m23s
+istio-ingressgateway-7b66b7c7c-gwdrq      1/1     Running     0          3m22s
+istio-pilot-7d5c97cc67-9p8lv              2/2     Running     2          3m22s
+istio-policy-86775c9966-qkdxt             2/2     Running     2          3m22s
+istio-security-post-install-1.4.2-kgzgt   0/1     Completed   0          3m22s
+istio-sidecar-injector-59ccc94d59-mq2jg   1/1     Running     0          3m21s
+istio-telemetry-68c7b4f9b8-5t2sq          2/2     Running     2          3m22s
+istio-tracing-55c965d5b6-fkxs7            1/1     Running     0          3m21s
+kiali-74fdc898b9-f7fjw                    1/1     Running     0          3m22s
+prometheus-c8fdbd64f-6k7fw                1/1     Running     0          3m22s
+----
+
+In the last step enable automatic sidecar injection:
+----
+$ kubectl label namespace default istio-injection=enabled
+----
