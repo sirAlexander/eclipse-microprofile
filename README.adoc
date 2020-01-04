@@ -9,3 +9,12 @@ In order to build cloud-native applications and microservices, it’s very conve
 ==== Minikube
 
 I’ve chosen is https://kubernetes.io/docs/setup/minikube/[Minikube] which runs a single-node Kubernetes cluster inside a VM on your development machine.
+
+===== Install and Set Up kubectl on Ubuntu
+
+I highly recommend using `snap package manager`, kubectl is available as a snap application.
+----
+snap install kubectl --classic
+
+kubectl version
+----
