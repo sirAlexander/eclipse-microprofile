@@ -389,3 +389,31 @@ In the last step enable automatic sidecar injection:
 ----
 $ kubectl label namespace default istio-injection=enabled
 ----
+
+==== Getting familiar with the various kubernetes tools
+After the setup of Minikube and Istio you can use the following tools:
+
+* _Kubernetes Dashboard_
+----
+$ minikube dashboard
+----
+
+
+* _Jaeger Dashboard_
+----
+$ kubectl port-forward -n istio-system $(kubectl get pod -n istio-system -l app=jaeger -o jsonpath='{.items[0].metadata.name}') 16686:16686
+----
+_URL to Open Jaeger: http://localhost:16686_
+
+
+* _Grafana Dashboard_
+----
+$ kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=grafana -o jsonpath='{.items[0].metadata.name}') 3000:3000 &
+----
+_URL to open Grafana: http://localhost:3000/dashboard/db/istio-mesh-dashboard_
+
+* _Prometheus Dashboard_
+----
+$ kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=prometheus -o jsonpath='{.items[0].metadata.name}') 9090:9090 &
+----
+_URL to open Prometheus: http://localhost:9090_
