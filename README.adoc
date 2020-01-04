@@ -8,7 +8,7 @@ In order to build cloud-native applications and microservices, it’s very conve
 
 ==== Minikube
 
-I’ve chosen is https://kubernetes.io/docs/setup/minikube/[Minikube] which runs a single-node Kubernetes cluster inside a VM on your development machine.
+I’ve chosen https://kubernetes.io/docs/setup/minikube/[Minikube] which runs a single-node Kubernetes cluster inside a VM on your development machine.
 
 ===== Install and Set Up kubectl on Ubuntu
 
@@ -417,3 +417,22 @@ _URL to open Grafana: http://localhost:3000/dashboard/db/istio-mesh-dashboard_
 $ kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=prometheus -o jsonpath='{.items[0].metadata.name}') 9090:9090 &
 ----
 _URL to open Prometheus: http://localhost:9090_
+
+
+==== Kiali Installation
+Run the following command to install Kiali:
+----
+$ bash <(curl -L https://git.io/getLatestKialiOperator)
+----
+
+* _Kiali Dashboard_
+----
+$ cd /<PATH TO ISTIO DIRECTORY>/istio-1.4.2/
+$ istioctl dashboard kiali
+----
+_URL to open Kiali: https://localhost:<KIALI_PORT>
+
+To uninstall Kiali, use the following command:
+----
+$ bash <(curl -L https://git.io/getLatestKialiOperator) --uninstall-mode true
+----
