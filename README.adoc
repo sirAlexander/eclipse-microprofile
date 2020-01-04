@@ -430,7 +430,8 @@ $ bash <(curl -L https://git.io/getLatestKialiOperator)
 $ cd /<PATH TO ISTIO DIRECTORY>/istio-1.4.2/
 $ istioctl dashboard kiali
 ----
-_URL to open Kiali: https://localhost:<KIALI_PORT>
+
+_URL to open Kiali: https://localhost:<KIALI_PORT>_
 
 To uninstall Kiali, use the following command:
 ----
