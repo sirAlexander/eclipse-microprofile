@@ -27,8 +27,28 @@ $ grep -E --color 'vmx|svm' /proc/cpuinfo
 ----
 
 Verify that `kubectl` was installed correctly
+----
+$ kubectl version -o json
+----
 
-===== Install a Hypervisor
+You should see similar output:
+----
+{
+  "clientVersion": {
+    "major": "1",
+    "minor": "17",
+    "gitVersion": "v1.17.0",
+    "gitCommit": "70132b0f130acc0bed193d9ba59dd186f0e634cf",
+    "gitTreeState": "clean",
+    "buildDate": "2019-12-10T03:03:57Z",
+    "goVersion": "go1.13.5",
+    "compiler": "gc",
+    "platform": "linux/amd64"
+  }
+}
+----
+
+====== Install a Hypervisor
 * Update your system with the latest version. You can do this by running the following commands:
 ----
 $ sudo apt-get update -y
@@ -60,4 +80,50 @@ $ sudo apt update && sudo apt install virtualbox-6.1
 ** Use the command below if you need to `remove` VirtualBox from Ubuntu
 ----
 $ sudo apt remove virtualbox virtualbox-*
+----
+
+===== Completion of MiniKube Installation
+* Download the latest version of `Minikube` to your system. You can download it from their official websites with the following command:
+----
+ $ wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+----
+* Once the download is completed, copy the downloaded file under /usr/local/bin with the following command:
+----
+$ cp minikube-linux-amd64 /usr/local/bin/minikube
+----
+* Next, give execution permission to the minikube with the following command:
+----
+$ chmod 755 /usr/local/bin/minikube
+----
+* Next, check the version of Minikube with the following command:
+----
+$ minikube version
+----
+* You should get the following output:
+----
+minikube version: v1.6.2
+commit: 54f28ac5d3a815d1196cd5d57d707439ee4bb392
+----
+
+==== Start Minikube
+With all the required packages are installed. You can now start Minikube with the following command:
+----
+$ minikube start
+----
+
+This will download the Virtualbox image and configure Kubernetes cluster as shown below:
+----
+😄  minikube v1.6.2 on Ubuntu 18.04
+✨  Automatically selected the 'virtualbox' driver (alternates: [none])
+💿  Downloading VM boot image ...
+    > minikube-v1.6.0.iso.sha256: 65 B / 65 B [--------------] 100.00% ? p/s 0s
+    > minikube-v1.6.0.iso: 150.93 MiB / 150.93 MiB [-] 100.00% 19.41 MiB p/s 8s
+🔥  Creating virtualbox VM (CPUs=2, Memory=2000MB, Disk=20000MB) ...
+🐳  Preparing Kubernetes v1.17.0 on Docker '19.03.5' ...
+💾  Downloading kubeadm v1.17.0
+💾  Downloading kubelet v1.17.0
+🚜  Pulling images ...
+🚀  Launching Kubernetes ...
+⌛  Waiting for cluster to come online ...
+🏄  Done! kubectl is now configured to use "minikube"
 ----
