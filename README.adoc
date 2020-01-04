@@ -1,4 +1,4 @@
-=== eclipse-microprofile
+=== Eclipse MicroProfile
 
 Optimizing Enterprise Java for a Microservices Architecture
 
@@ -126,4 +126,97 @@ This will download the Virtualbox image and configure Kubernetes cluster as show
 🚀  Launching Kubernetes ...
 ⌛  Waiting for cluster to come online ...
 🏄  Done! kubectl is now configured to use "minikube"
+----
+
+==== Verifying cluster status and kubectl configuration
+
+You can now check the cluster status with the following command:
+----
+$ kubectl cluster-info
+----
+
+You should get the following output:
+----
+Kubernetes master is running at https://192.168.99.100:8443
+KubeDNS is running at https://192.168.99.100:8443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+----
+
+You can also check the Kubectl default configuration with the following command:
+----
+$ kubectl config view
+----
+
+Below is the expected output:
+----
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: /home/sir_alexander/.minikube/ca.crt
+    server: https://192.168.99.100:8443
+  name: minikube
+contexts:
+- context:
+    cluster: minikube
+    user: minikube
+  name: minikube
+current-context: minikube
+kind: Config
+preferences: {}
+users:
+- name: minikube
+  user:
+    client-certificate: /home/sir_alexander/.minikube/client.crt
+    client-key: /home/sir_alexander/.minikube/client.key
+----
+
+To check the running nodes, run the following command:
+----
+$ kubectl get nodes
+----
+
+output:
+----
+NAME       STATUS   ROLES    AGE   VERSION
+minikube   Ready    master   16m   v1.17.0
+----
+
+You can check the status of Minikube with the following command:
+----
+$ minikube status
+----
+And see the following output:
+----
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+----
+
+You can also access the Minikube Virtualbox with the following command:
+----
+$ minikube ssh
+----
+and get:
+----
+                         _             _
+            _         _ ( )           ( )
+  ___ ___  (_)  ___  (_)| |/')  _   _ | |_      __
+/' _ ` _ `\| |/' _ `\| || , <  ( ) ( )| '_`\  /'__`\
+| ( ) ( ) || || ( ) || || |\`\ | (_) || |_) )(  ___/
+(_) (_) (_)(_)(_) (_)(_)(_) (_)`\___/'(_,__/'`\____)
+
+$
+----
+
+Now, exit from the Virtualbox shell:
+----
+$ exit
+----
+
+You can also stop and delete kubernetes cluster anytime with the following command:
+----
+$ minikube stop
+$ minikube delete
 ----
