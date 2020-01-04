@@ -1,0 +1,11 @@
+=== eclipse-microprofile
+
+Optimizing Enterprise Java for a Microservices Architecture
+
+=== Setup of a Local Kubernetes and Istio Dev Environment
+
+In order to build cloud-native applications and microservices, it’s very convenient to have a local https://kubernetes.io/[Kubernetes] cluster and https://istio.io/[Istio] running locally. This article describes how to install these components and some additional tools like https://www.kiali.io/[Kiali].
+
+==== Minikube
+
+I’ve chosen is https://kubernetes.io/docs/setup/minikube/[Minikube] which runs a single-node Kubernetes cluster inside a VM on your development machine.
