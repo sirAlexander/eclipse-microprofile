@@ -96,5 +96,6 @@ We will use `istioctl` to install Istio:
 7. Enable automatic sidecar injection for `default`namespace:
 
     ```
-    $ kubect
+    $ kubectl label namespace default istio-injection=enabled
+    ```
 
