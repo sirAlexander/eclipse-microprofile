@@ -6,7 +6,7 @@ After following these instructions you will be able to use the Kubernetes dashbo
 
 ### Minikube
 
-Follow the [instructions](https://kubernetes.io/docs/tasks/tools/install-minikube/) to install Minikube. 
+Follow the [instructions](../minikube-starter/README.md) to install Minikube. 
 
 This project has been tested with Minikube version 1.5.2. 
 
