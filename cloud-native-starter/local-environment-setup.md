@@ -17,14 +17,14 @@ $ minikube config set cpus 2
 $ minikube config set memory 8192
 $ minikube config set disk-size 50g
 $ minikube start -p cloud-native-starter
-$ eval $(minikube docker-env)
+$ eval $(minikube -p cloud-native-starter docker-env)
 ```
 
 When Minikube is started you can get the IP address and open the Kubernetes dashboard with these commands:
 
 ```
-$ minikube ip
-$ minikube dashboard
+$ minikube -p cloud-native-starter ip
+$ minikube -p cloud-native-starter dashboard
 ```
 
 To stop the cluster run this command:
