@@ -48,9 +48,10 @@ We will use `istioctl` to install Istio:
 
 2. Add `istioctl` to the PATH environment variable, e.g copy paste in your shell and/or `~/.profile`. Follow the instructions in the installer message.
 
-
     ```
-    export PATH="$PATH:/path/to/istio-1.5.1/bin"
+    cd istio-1.5.1/
+
+    export PATH=$PWD/bin:$PATH
     ```
 
 3. Verify the `istioctl` installation:
