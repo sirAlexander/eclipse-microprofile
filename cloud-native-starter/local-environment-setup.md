@@ -30,8 +30,8 @@ $ minikube dashboard
 To stop the cluster run this command:
 
 ```
-$ minikube stop
-
+$ minikube stop -p cloud-native-starter
+```
 
 export PATH="$PATH:/home/sir_alexander/istio-1.5.1/bin"
  
