@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/cloud-native-starter/articles-java-jee/articles.iml" filepath="$PROJECT_DIR$/cloud-native-starter/articles-java-jee/articles.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/shikanga-cloudnative-kubernetes.iml" filepath="$PROJECT_DIR$/.idea/shikanga-cloudnative-kubernetes.iml" />
     </modules>
   </component>

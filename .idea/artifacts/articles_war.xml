@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="articles:war">
+    <output-path>$PROJECT_DIR$/cloud-native-starter/articles-java-jee/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>articles</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="articles.war">
+      <element id="artifact" artifact-name="articles:war exploded" />
+    </root>
+  </artifact>
+</component>
