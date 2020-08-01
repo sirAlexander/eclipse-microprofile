@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/cloud-native-starter/articles-java-jee/articles.iml" filepath="$PROJECT_DIR$/cloud-native-starter/articles-java-jee/articles.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/shikanga-cloudnative-kubernetes.iml" filepath="$PROJECT_DIR$/.idea/shikanga-cloudnative-kubernetes.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloud-native-starter/web-api-java-jee/web-api.iml" filepath="$PROJECT_DIR$/cloud-native-starter/web-api-java-jee/web-api.iml" />
     </modules>
   </component>
 </project>
