@@ -19,3 +19,9 @@ Deploy the `articles` backend microservice
 ```shell script
 scripts/deploy-articles-java-jee.sh
 ```
+
+Deploy the second microservice `web-api v1`. This is a BFF(backend for frontend) service used to display *articles* 
+with *authors*.
+```shell script
+scripts/deploy-web-api-java-jee.sh
+```
