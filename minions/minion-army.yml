@@ -10,6 +10,12 @@ spec:
   selector:
     matchLabels:
       app: one-eyed-minion
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   template:
     metadata:
       name: one-eyed-minion
@@ -18,7 +24,7 @@ spec:
     spec:
       containers:
         - name: one-eyed-minion
-          image: minions:latest
+          image: minions:0.2
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
@@ -40,4 +46,200 @@ spec:
     - port: 8080
       targetPort: 8080
       nodePort: 30080
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: two-eyed-minion-deployment
+  labels:
+    app: two-eyed-minion
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: two-eyed-minion
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      name: two-eyed-minion
+      labels:
+        app: two-eyed-minion
+    spec:
+      containers:
+        - name: two-eyed-minion
+          image: minions:0.2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: -Xmx64m -Xms64m
+            - name: SPRING_APPLICATION_NAME
+              value: "two-eyed-minion"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: two-eyed-minion-entrypoint
+  namespace: default
+spec:
+  selector:
+    app: two-eyed-minion
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30081
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sad-minion-deployment
+  labels:
+    app: sad-minion
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sad-minion
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      name: sad-minion
+      labels:
+        app: sad-minion
+    spec:
+      containers:
+        - name: sad-minion
+          image: minions:0.2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: -Xmx64m -Xms64m
+            - name: SPRING_APPLICATION_NAME
+              value: "sad-minion"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sad-minion-entrypoint
+  namespace: default
+spec:
+  selector:
+    app: sad-minion
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30082
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: happy-minion-deployment
+  labels:
+    app: happy-minion
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: happy-minion
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      name: happy-minion
+      labels:
+        app: happy-minion
+    spec:
+      containers:
+        - name: happy-minion
+          image: minions:0.2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: -Xmx64m -Xms64m
+            - name: SPRING_APPLICATION_NAME
+              value: "happy-minion"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: happy-minion-entrypoint
+  namespace: default
+spec:
+  selector:
+    app: happy-minion
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30083
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: one-eye-sad-minion-deployment
+  labels:
+    app: one-eye-sad-minion
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: one-eye-sad-minion
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      name: one-eye-sad-minion
+      labels:
+        app: one-eye-sad-minion
+    spec:
+      containers:
+        - name: one-eye-sad-minion
+          image: minions:0.2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: -Xmx64m -Xms64m
+            - name: SPRING_APPLICATION_NAME
+              value: "one-eye-sad-minion"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: one-eye-sad-minion-entrypoint
+  namespace: default
+spec:
+  selector:
+    app: one-eye-sad-minion
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30084
   type: NodePort
