@@ -1,0 +1,7 @@
+
+
+eval $(minikube -p minions docker-env)
+
+docker build . -t minions
+
+mvn spring-boot:build-image -Dspring-boot.build-image.imageName=minions -DskipTests

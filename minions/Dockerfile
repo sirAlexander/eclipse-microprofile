@@ -4,7 +4,7 @@ COPY src /usr/src/myapp/src
 COPY pom.xml /usr/src/myapp
 RUN mvn -f /usr/src/myapp/pom.xml clean package -DskipTests
 
-FROM openjdk:alpine
+FROM openjdk:11-jdk-slim
 
 COPY --from=BUILDMINION /usr/src/myapp/target/*.jar /maven/
 

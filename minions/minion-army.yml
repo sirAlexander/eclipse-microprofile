@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: one-eyed-minion-deployment
+  labels:
+    app: one-eyed-minion
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: one-eyed-minion
+  template:
+    metadata:
+      name: one-eyed-minion
+      labels:
+        app: one-eyed-minion
+    spec:
+      containers:
+        - name: one-eyed-minion
+          image: minions:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JAVA_OPTS
+              value: -Xmx64m -Xms64m
+            - name: SPRING_APPLICATION_NAME
+              value: "one-eyed-minion"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: one-eyed-minion-entrypoint
+  namespace: default
+spec:
+  selector:
+    app: one-eyed-minion
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
+  type: NodePort
