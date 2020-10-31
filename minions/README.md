@@ -1,3 +1,9 @@
+# Minions for minikube
+
+## The Aim
+Our minion army will be Java microservices. We want different types of minions in our army so that we see what Kubernetes can do for us. So we’ll aim for each microservice to respond to a simple http request with a response like:
+
+
 ## Getting Started
 
 ```
