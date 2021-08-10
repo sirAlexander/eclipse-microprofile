@@ -1,24 +1,19 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: k8s-traefik-example
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysite-nginx
+  name: mydog-nginx
   namespace: k8s-traefik-example
   labels:
-    app: mysite-nginx
+    app: mydog-nginx
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mysite-nginx
+      app: mydog-nginx
   template:
     metadata:
       labels:
-        app: mysite-nginx
+        app: mydog-nginx
     spec:
       containers:
         - name: nginx
@@ -31,16 +26,16 @@ spec:
       volumes:
         - name: html-volume
           configMap:
-            name: mysite-html
+            name: mydog-html
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysite-nginx-service
+  name: mydog-nginx-service
   namespace: k8s-traefik-example
 spec:
   selector:
-    app: mysite-nginx
+    app: mydog-nginx
   ports:
     - protocol: TCP
       port: 80
@@ -48,15 +43,16 @@ spec:
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: mysite-nginx-ingress
+  name: mydog-nginx-ingress
   namespace: k8s-traefik-example
   annotations:
     kubernetes.io/ingress.class: "traefik"
+    traefik.frontend.rule.type: PathPrefixStrip
 spec:
   rules:
     - http:
         paths:
-          - path: /
+          - path: /mydog
             backend:
-              serviceName: mysite-nginx-service
+              serviceName: mydog-nginx-service
               servicePort: 80
