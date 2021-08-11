@@ -29,5 +29,13 @@ In this configuration, we have named our service `mysite-nginx-service`. We prov
 The ingress configuration specifies how to get traffic from outside our cluster to services inside our cluster. Remember, k3s comes pre-configured with Traefik as an ingress controller. Therefore, we will write our ingress configuration specific to Traefik. Add the following to `mysite.yaml`
 
 ```
+kubectl create namespace k8s-traefik-example
+
+kubectl create configmap mysite-html --from-file index.html --namespace="k8s-traefik-example"
+kubectl apply -f mysite.yaml --namespace="k8s-traefik-example"
+
+
 kubectl create configmap mydog-html --from-file html --namespace="k8s-traefik-example"
 ```
+
+Refeernce: https://opensource.com/article/20/3/kubernetes-traefik
