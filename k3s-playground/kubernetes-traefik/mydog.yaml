@@ -40,19 +40,23 @@ spec:
     - protocol: TCP
       port: 80
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mydog-nginx-ingress
   namespace: k8s-traefik-example
   annotations:
     kubernetes.io/ingress.class: "traefik"
-    traefik.frontend.rule.type: PathPrefixStrip
+    traefik.ingress.kubernetes.io/router.entrypoints: "web"
+    traefik.ingress.kubernetes.io/rule-type: "PathPrefixStrip"
 spec:
   rules:
     - http:
         paths:
           - path: /mydog
+            pathType: Prefix
             backend:
-              serviceName: mydog-nginx-service
-              servicePort: 80
+              service:
+                name: mydog-nginx-service
+                port:
+                  number: 80

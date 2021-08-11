@@ -30,12 +30,18 @@ The ingress configuration specifies how to get traffic from outside our cluster 
 
 ```
 kubectl create namespace k8s-traefik-example
+```
 
+```
 kubectl create configmap mysite-html --from-file index.html --namespace="k8s-traefik-example"
+
 kubectl apply -f mysite.yaml --namespace="k8s-traefik-example"
+```
 
-
+```
 kubectl create configmap mydog-html --from-file html --namespace="k8s-traefik-example"
+
+kubectl apply -f mydog.yaml --namespace="k8s-traefik-example"
 ```
 
 Refeernce: https://opensource.com/article/20/3/kubernetes-traefik
