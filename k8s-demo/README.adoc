@@ -1,0 +1,5 @@
+== How to base64 encode
+
+```
+echo -n <value-to-encode> | base64
+```
