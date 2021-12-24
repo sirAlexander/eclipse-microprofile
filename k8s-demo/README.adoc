@@ -3,3 +3,10 @@
 ```
 echo -n <value-to-encode> | base64
 ```
+
+=== Steps to deploy the k8s resources
+1. deploy the mongo config
+2. deploy the mongo secrets
+3. deploy the mongo db
+4. deploy the web app
+
