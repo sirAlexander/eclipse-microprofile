@@ -28,11 +28,22 @@ kubectl create namespace argocd
 kubectl apply -n argocd -f install.yaml
 
 ```
+
 4. Once all pods are upd and running, check with `$ kubectl get pods -n argocd` we can now check what services were deployed.
 
 5. To check for available services, use `$ kubectl get svc -n argocd`
 
 6. We will now access the ArgoCD server via port forwarding. Use the command below:
+
 ```
 kubectl port-forward -n argocd svc/argocd-server 9090:443
+```
+
+## Login using the CLI
+
+1. default username is `admin`
+2. Use the following command to retrieve the auto generated password.
+
+```
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
