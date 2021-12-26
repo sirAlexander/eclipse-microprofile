@@ -1,4 +1,4 @@
-# install ArgoCD on K3s
+# Install ArgoCD on K3s
 
 ArgoCD doesn't support the arm64 architecture out of the box. So to get ArgoCD working on the raspberry Pi 4+
 
