@@ -11,11 +11,11 @@ spec:
     path: /git-ops-config/argocd/dev
   destination:
     server: https://kubernetes.default.svc
-    namsespace: myapp-git-ops
+    namespace: myapp-git-ops
 
   syncPolicy:
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true
     automated:
       selfHeal: true
       prune: true
