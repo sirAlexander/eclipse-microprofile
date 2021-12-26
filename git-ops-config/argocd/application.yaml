@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/sirAlexander/shikanga-cloudnative-kubernetes.git
     targetRevision: HEAD
-    path: /git-ops-config/argocd/dev
+    path: git-ops-config/argocd/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: myapp-git-ops
