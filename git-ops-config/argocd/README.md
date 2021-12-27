@@ -39,11 +39,39 @@ kubectl apply -n argocd -f install.yaml
 kubectl port-forward -n argocd svc/argocd-server 9090:443
 ```
 
+7. Now access the server via `localhost:9090`
+
 ## Login using the CLI
 
 1. default username is `admin`
 2. Use the following command to retrieve the auto generated password.
 
 ```
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+$ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
+
+## Installing Tekton
+
+1. The command below will install the controller and webhooks
+
+```
+kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+
+kubectl get pods --namespace tekton-pipelines
+```
+
+2. After successfully both the controllers and webhook, install the dashboard with the following command
+
+```
+kubectl apply --filename https://github.com/tektoncd/dashboard/releases/latest/download/tekton-dashboard-release.yaml
+
+kubectl get pods --namespace tekton-pipelines
+```
+
+3. We will now access the Tekton dashboard via port forwarding. Use the command below:
+
+```
+kubectl port-forward -n tekton-pipelines svc/tekton-dashboard 9097:9097
+```
+
+4. Now access the dashboard via `localhost:9097`
