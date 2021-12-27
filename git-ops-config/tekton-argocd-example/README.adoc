@@ -64,3 +64,29 @@ Then execute
 ----
 kubectl apply -n tekton-pipelines -f regsecret.yaml
 ----
+
+
+== Download & Install Istio on the Raspberry Pi 4+
+
+. Download and extract the latest release automatically
+----
+curl -L https://istio.io/downloadIstio | sh -
+----
+
+[start=2]
+. Move to the Istio package directory. For example, if the package is `istio-1.12.1:`
+----
+cd istio-1.12.1
+----
+
+[start=3]
+. Add the istioctl client to your path (Linux or macOS):
+----
+export PATH=$PWD/bin:$PATH
+----
+
+[start=4]
+. Install the arm-64 version of Istio with the command below:
+----
+istioctl install --set hub=docker.io/querycapistio
+----
