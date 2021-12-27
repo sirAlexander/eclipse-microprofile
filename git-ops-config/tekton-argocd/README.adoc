@@ -1,0 +1,11 @@
+== Tekton with ArgoCD
+
+Create secrets for SSH GitHub
+
+This is one way to create a SSH key, that will be added to GitHub.
+
+----
+ssh-keygen -t rsa -b 4096 -C "tekton@shikanga.co.uk"
+# save as tekton / tekton.pub
+# add tekton.pub contents to GitHub
+----
