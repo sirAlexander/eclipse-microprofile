@@ -1,6 +1,6 @@
 == Tekton with ArgoCD
 
-Create secrets for SSH GitHub
+=== Create secrets for SSH GitHub
 
 This is one way to create a SSH key, that will be added to GitHub.
 
@@ -10,13 +10,13 @@ ssh-keygen -t rsa -b 4096 -C "tekton@shikanga.co.uk"
 # add tekton.pub contents to GitHub
 ----
 
-== Create secret YAML from ssh key contents
+==== Create secret YAML from ssh key contents
 
 ----
 cat tekton | base64 -w 0; echo
 ----
 
-followed by
+Followed by
 
 ----
 cat > tekton-git-ssh-secret.yaml << EOM
@@ -31,4 +31,36 @@ type: kubernetes.io/ssh-auth
 data:
   ssh-privatekey: <base64 data>
 EOM
+----
+
+Then execute
+
+----
+kubectl apply -f tekton-git-ssh-secret.yaml
+----
+
+=== Create secrets for Docker Registry
+
+----
+cat ~/.docker/config.json | base64 -w 0; echo
+----
+
+Followed by
+
+----
+cat > regsecret.yaml << EOM
+kind: Secret
+apiVersion: v1
+metadata:
+  name: regsecret
+data:
+  .dockercfg: <base 64 data>
+type: kubernetes.io/dockercfg
+EOM
+----
+
+Then execute
+
+----
+kubectl apply -n tekton-pipelines -f regsecret.yaml
 ----
