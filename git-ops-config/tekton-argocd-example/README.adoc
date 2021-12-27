@@ -90,3 +90,46 @@ export PATH=$PWD/bin:$PATH
 ----
 istioctl install --set hub=docker.io/querycapistio
 ----
+
+
+
+== Dealing with stuck namespaces
+
+Sometimes when dealing with K8s, you might find yourself in a position where you cannot delete a namespace. The namespace, seems to be stuck in the "Terminating" phase
+
+https://www.ibm.com/docs/en/cloud-private/3.2.0?topic=console-namespace-is-stuck-in-terminating-state
+
+
+[start=1]
+. create a directory to work in
+----
+mkdir stuck-namespaces
+
+cd stuck-namespaces
+
+kubectl get namespace <terminating-namespace> -o json >tmp.json
+----
+
+[start=2]
+. Edit your tmp.json file. Remove the kubernetes value from the finalizers field and save the file.
+----
+nano tmp.json
+----
+
+[start=3]
+. To set a temporary proxy IP and port, run the following command. Be sure to keep your terminal window open until you delete the stuck namespace:
+----
+kubectl proxy --port=9999
+----
+
+[start=4]
+. From a new terminal window, make an API call with your temporary proxy IP and port:
+----
+curl -k -H "Content-Type: application/json" -X PUT --data-binary @tmp.json http://127.0.0.1:9999/api/v1/namespaces/<terminating-namespace>/finalize
+----
+
+[start=5]
+. Verify that the terminating namespace is removed:
+----
+ kubectl get namespaces
+ ----
