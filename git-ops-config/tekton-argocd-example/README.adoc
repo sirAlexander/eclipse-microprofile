@@ -1,5 +1,10 @@
 == Tekton with ArgoCD
 
+=== Prerequisites
+1. install Istio
+2. Install Argo CD
+3. Install Tekton
+
 === Create secrets for SSH GitHub
 
 This is one way to create a SSH key, that will be added to GitHub.
@@ -63,6 +68,16 @@ Then execute
 
 ----
 kubectl apply -n tekton-pipelines -f regsecret.yaml
+----
+
+Setup the Tekton serviceaccount:
+----
+kubectl apply -f tekton/
+----
+
+Create `systemtest` and `production` namespaces
+----
+kubectl apply -f namespaces/
 ----
 
 
