@@ -80,6 +80,11 @@ Create `systemtest` and `production` namespaces
 kubectl apply -f namespaces/
 ----
 
+create your Docker registry secret, for the newly created namespaces
+----
+kubectl apply -n systemtest -f regsecret.yaml
+kubectl apply -n production -f regsecret.yaml
+----
 
 == Download & Install Istio on the Raspberry Pi 4+
 
