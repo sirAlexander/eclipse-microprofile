@@ -68,6 +68,8 @@ kubectl apply -n tekton-pipelines -f regsecret.yaml
 
 == Download & Install Istio on the Raspberry Pi 4+
 
+Reference: https://istio.io/latest/docs/setup/getting-started/
+
 . Download and extract the latest release automatically
 ----
 curl -L https://istio.io/downloadIstio | sh -
@@ -83,12 +85,35 @@ cd istio-1.12.1
 . Add the istioctl client to your path (Linux or macOS):
 ----
 export PATH=$PWD/bin:$PATH
+
+export PATH=$PWD/tools/istio-1.12.1/bin:$PATH
 ----
 
 [start=4]
 . Install the arm-64 version of Istio with the command below:
 ----
-istioctl install --set hub=docker.io/querycapistio
+istioctl install --set hub=docker.io/querycapistio --set profile=demo -y
+----
+
+Add arm64 in the nodeAffinity:
+----
+kubectl patch deployments.apps \
+  istio-ingressgateway \
+  --namespace istio-system \
+  --type='json' \
+  -p='[
+  {"op": "replace", "path": "/spec/template/spec/affinity/nodeAffinity/preferredDuringSchedulingIgnoredDuringExecution/0/preference/matchExpressions/0/values", "value": [amd64,arm64]},
+  {"op": "replace", "path": "/spec/template/spec/affinity/nodeAffinity/requiredDuringSchedulingIgnoredDuringExecution/nodeSelectorTerms/0/matchExpressions/0/values", "value": [amd64,arm64,ppc64le,s390x]}
+  ]'
+ 
+kubectl patch deployments.apps \
+  istio-egressgateway \
+  --namespace istio-system \
+  --type='json' \
+  -p='[
+  {"op": "replace", "path": "/spec/template/spec/affinity/nodeAffinity/preferredDuringSchedulingIgnoredDuringExecution/0/preference/matchExpressions/0/values", "value": [amd64,arm64]},
+  {"op": "replace", "path": "/spec/template/spec/affinity/nodeAffinity/requiredDuringSchedulingIgnoredDuringExecution/nodeSelectorTerms/0/matchExpressions/0/values", "value": [amd64,arm64,ppc64le,s390x]}
+  ]'
 ----
 
 
