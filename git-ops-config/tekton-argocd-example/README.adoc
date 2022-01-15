@@ -178,3 +178,6 @@ curl -k -H "Content-Type: application/json" -X PUT --data-binary @tmp.json http:
 ----
  kubectl get namespaces
  ----
+
+
+ kubectl create secret -n tekton-pipelines generic argocd-env-secret '--from-literal=ARGOCD_AUTH_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1ZGVhZmU3Yi1iNGEzLTRlODktOThmMC0wMGZkMjQ4ZGNlNzEiLCJpYXQiOjE2NDA3MDQ4MzEsImlzcyI6ImFyZ29jZCIsIm5iZiI6MTY0MDcwNDgzMSwic3ViIjoidGVrdG9uOmFwaUtleSJ9.vcWmO9hCkKznPOIWgRIx6oy2P-HPnvXccb8NroKoo7s'

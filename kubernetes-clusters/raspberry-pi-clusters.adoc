@@ -1,0 +1,496 @@
+## Creating a pi cluster
+
+### Flashing SD-cards
+
+I prefer using etcher for flashing SD-cards, it’s super easy. You can find a copy here (https://etcher.io/). 
+
+Download Raspberry pi OS lite from >> https://www.raspberrypi.org/software/operating-systems/
+
+Insert the SD-card, use the image you just downloaded and then press: `flash`.
+
+Once the image is flashed, take it out, and insert into the machine again (or just mount it again).
+
+boot it up, and make sure it’s up to date with 
+
+```
+$ sudo apt -y update && sudo apt -y upgrade
+```
+
+The default username/password for Raspbian is: `pi`/`raspberry`
+
+
+Then run 
+
+```
+$ sudo raspi-config
+```
+
+and perform the following steps:
+
+	• 3 >> Interface Options >> Enable SSH
+	• 6 >> Advance Options >> Expand Filesystem
+	• 1 >> System Options >> Change the ‘pi’ user password.
+	• 8 >> Update Tool to latest version
+
+Also run the following to check the the default hostname works
+
+```
+ping pi@raspberrypi.local
+```
+
+After a minute or so, you should be able to SSH into the Raspberry Pi as follows:
+
+```
+$ ssh pi@raspberrypi.local
+```
+
+
+### Setup hostname and attach static ip
+
+Next, we want to make the Raspberry Pi easier to identify, and therefore provide it with a new hostname, and further assign it a static IP.
+In order to make this as easy for you, I’ve created the following script, that you can copy to the Raspberry Pi and execute:
+
+```
+$ nano hostname_and_ip.sh
+```
+
+and insert the script:
+
+```
+#!/bin/sh
+
+hostname=$1
+ip=$2 # should be of format: 192.168.1.100
+dns=$3 # should be of format: 192.168.1.1
+
+# Change the hostname
+sudo hostnamectl --transient set-hostname $hostname
+sudo hostnamectl --static set-hostname $hostname
+sudo hostnamectl --pretty set-hostname $hostname
+sudo sed -i s/raspberrypi/$hostname/g /etc/hosts
+
+# Set the static ip
+
+sudo cat <<EOT >> /etc/dhcpcd.conf
+interface eth0
+static ip_address=$ip/24
+static routers=$dns
+static domain_name_servers=$dns
+EOT
+```
+
+Now run the script, an example of my naming and ip convention can be seen below. But adapt to your liking.
+
+First argument: the new hostname
+Second argument: the new static IP
+Third argument: the IP of your Router
+
+```
+sh hostname_and_ip.sh k8s-main 192.168.0.100 192.168.0.1
+```
+
+Now, reboot the Pi. 
+
+```
+$ sudo reboot
+```
+
+You should be able to access the Pi over SSH as follows:
+
+```
+$ ssh pi@k8s-main.local
+```
+
+Verify that your Pi now also has a new static IP by running 
+
+```
+$ ifconfig.
+```
+
+### Installing the prerequisites
+
+Now, that the static networking and naming is in place, we need to install some software on the Raspberry Pi.
+
+### Installing Docker
+
+1. $ curl -fsSL https://get.docker.com -o install-docker.sh
+2. $ sudo sh install-docker.sh
+3. $ sudo usermod -aG docker pi
+4. $ sudo reboot
+5. $ docker version
+6. $ docker info
+7. $ docker run hello-world
+
+
+Therefore, create a new file on the Raspberry Pi:
+
+```
+$ nano install.sh
+```
+
+Copy and insert the following script.
+
+```
+#!/bin/sh
+
+# Install Docker
+curl -sSL get.docker.com | sh && \
+sudo usermod pi -aG docker
+
+# Disable Swap
+sudo dphys-swapfile swapoff && \
+sudo dphys-swapfile uninstall && \
+sudo update-rc.d dphys-swapfile remove
+echo Adding " cgroup_enable=cpuset cgroup_enable=memory" to /boot/cmdline.txt
+sudo cp /boot/cmdline.txt /boot/cmdline_backup.txt
+orig="$(head -n1 /boot/cmdline.txt) cgroup_enable=cpuset cgroup_enable=memory"
+echo $orig | sudo tee /boot/cmdline.txt
+
+# Add repo list and install kubeadm
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && \
+echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list && \
+sudo apt-get update -q && \
+sudo apt-get install -qy kubeadm
+```
+
+Execute the script
+
+```
+$ sh install.sh
+```
+
+This will install and configure docker, disable swap and install kubeadm.
+Reboot the machine, and repeat this process for all your Raspberry Pis.
+
+
+## Installing Java 11 on Raspberry Pi 
+
+OpenJDK 11 is the default Java development and runtime in the latest Raspbian OS, which is based on Debian 10, Buster.
+
+Run the following commands to install the OpenJDK 11 JDK on your Raspberry Pi:
+
+```
+$ sudo apt update
+$ sudo apt install default-jdk
+````
+
+https://medium.com/javarevisited/how-to-install-and-use-java-11-and-javafx-11-on-raspberry-pi-boards-with-armv6-processor-ca7109b76b7c
+
+https://cdn.azul.com/zulu-embedded/bin/zulu11.48.21-ca-jdk11.0.11-linux_aarch32sf.tar.gz
+
+## Installing k3s on raspberry pi
+
+To replace install.sh step above
+
+
+======== Installation of k3s ========
+
+```
+$ curl -sfL https://get.k3s.io | sh -
+```
+
+--- Enabling legacy iptables on Raspbian Buster ---
+
+Raspbian Buster defaults to using nftables instead of iptables. K3S networking features require iptables and do not work with nftables. 
+Follow the steps below to switch configure Buster to use legacy iptables:
+
+```
+sudo iptables -F
+sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+```
+
+--- Enabling cgroups for Raspbian Buster
+
+Standard Raspbian Buster installations do not start with cgroups enabled. 
+K3S needs cgroups to start the systemd service. 
+cgroupscan be enabled by appending cgroup_memory=1 cgroup_enable=memory to /boot/cmdline.txt.
+
+``` example of /boot/cmdline.txt
+
+console=serial0,115200 console=tty1 root=PARTUUID=58b06195-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait cgroup_memory=1 cgroup_enable=memory
+```
+
+
+useful trouble shooting command
+
+```
+$ sudo k3s check-config
+```
+
+======= References ========
+
+https://magpi.raspberrypi.org/articles/build-a-raspberry-pi-cluster-computer
+
+https://github.com/pramalin/quarkus-raspberry-pi/blob/master/index.md
+
+https://www.balena.io/etcher/
+
+https://github.com/alexellis/k8s-on-raspbian
+
+====== Find Devices Connected to Your Network with nmap =======
+
+followm steps below:
+
+1. $ sudo apt install nmap
+
+2. $ sudo apt install net-tools
+
+3. $ ifconfig 	(192.168.0.13)
+
+4. $ nmap -sP 192.168.0.0/24
+
+
+reveals your pi's IP address
+```
+$ hostname -I
+``` 
+
+reveals your pi's disk size info
+```
+$ df -h
+``` 
+
+pi's shutdown command
+```
+sudo shutdown -h now
+```
+
+
+Job for k3s.service failed because a fatal signal was delivered causing the control process to dump core
+
+
+=== steps for ubuntu ====
+
+
+======= setting up static IP address =======
+
+https://linuxize.com/post/how-to-configure-static-ip-address-on-ubuntu-20-04/
+
+```
+sudo nano /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+
+network: {config: disabled}
+
+```
+
+ubuntu@ubuntu:~$ sudo mv /etc/netplan/50-cloud-init.yaml /etc/netplan/01-netcfg.yaml
+ubuntu@ubuntu:~$ cat /etc/netplan/50-cloud-init.yaml
+cat: /etc/netplan/50-cloud-init.yaml: No such file or directory
+ubuntu@ubuntu:~$ sudo nano /etc/netplan/01-netcfg.yaml
+
+
+network:
+    version: 2
+    renderer: networkd
+    ethernets:
+        eth0: 
+            dhcp4: no  
+            addresses: [192.168.0.100/24]
+            gateway4: 192.168.0.1
+            nameservers:
+                addresses: [192.168.0.1]
+
+
+```
+ubuntu@ubuntu:~$  sudo netplan apply
+```
+
+In case you run into some issues execute:
+
+```
+$ sudo netplan --debug apply
+```
+
+=== change hostname ====
+
+sudo hostnamectl set-hostname "new-hostname" 
+sudo hostnamectl set-hostname "new-hostname" --pretty
+sudo reboot
+
+- add "new-hostname" to host machines /etc/hosts/
+
+====== Copy over your ssh key ======
+
+Do you have an ssh key?
+
+```
+$ ls -l ~/.ssh/id_rsa.pub
+```
+if not 
+
+```
+$ ssh-keygen
+```
+
+else
+
+```
+ssh-copy-id ubuntu@k8s-main
+```
+
+==== install docker === ref: https://computingforgeeks.com/install-kubernetes-on-ubuntu-using-k3s/
+
+sudo apt update
+
+sudo apt -y upgrade && sudo systemctl reboot
+
+sudo apt install docker.io
+
+sudo usermod -aG docker ${USER}
+
+==== install k3s =======
+
+sudo nano /boot/firmware/cmdline.txt
+
+Add the cgroup_memory=1 cgroup_enable=memory to the end of the file.
+
+sudo reboot
+
+for k8s-main use the following:
+
+```
+curl -sfL https://get.k3s.io | sh -s - --docker
+```
+
+but for nodes use the following:
+
+You need to extract a token form the master that will be used to join the nodes to the master.
+
+```
+sudo cat /var/lib/rancher/k3s/server/node-token
+
+K10591cbcd3d3104d1486b0a907d56e375dfbdc2f1891594f05bafdf1f0d9ba4a20::server:4367f5ba4723f171210b0cb061d37fa2
+
+curl -sfL http://get.k3s.io | K3S_URL=https://<master_IP>:6443 K3S_TOKEN=<join_token> sh -s - --docker
+
+curl -sfL http://get.k3s.io | K3S_URL=https://192.168.0.100:6443 K3S_TOKEN=K10591cbcd3d3104d1486b0a907d56e375dfbdc2f1891594f05bafdf1f0d9ba4a20::server:4367f5ba4723f171210b0cb061d37fa2 sh -s - --docker
+```
+
+You can verify if the k3s-agent on the worker nodes is running by:
+
+```
+sudo systemctl status k3s-agent
+```
+
+=== below is for k8s-main ===
+
+sudo systemctl status k3s
+
+sudo kubectl get nodes -o wide
+
+==== uninstall k3s =====
+
+sudo /usr/local/bin/k3s-uninstall.sh
+
+sudo rm -rf /var/lib/rancher
+
+
+===== installing the dashboard ======
+
+```
+GITHUB_URL=https://github.com/kubernetes/dashboard/releases
+
+VERSION_KUBE_DASHBOARD=$(curl -w '%{url_effective}' -I -L -s -S ${GITHUB_URL}/latest -o /dev/null | sed -e 's|.*/||')
+
+kubectl --kubeconfig ~/tools/pi-cluster/k3s/k3s.yaml create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSION_KUBE_DASHBOARD}/aio/deploy/recommended.yaml
+
+```
+- create and apply resource manifests
+
+
+```
+nano dashboard.admin-user.yml
+```
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+  
+
+```
+nano dashboard.admin-user-role.yml
+```
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+  
+  
+==== Deploy the admin-user configuration: ====
+
+```
+kubectl --kubeconfig ~/tools/pi-cluster/k3s/k3s.yaml create -f dashboard.admin-user.yml -f dashboard.admin-user-role.yml
+```
+
+
+==== Obtain the Bearer Token ====
+
+```
+kubectl --kubeconfig ~/tools/pi-cluster/k3s/k3s.yaml -n kubernetes-dashboard describe secret admin-user-token | grep '^token'
+```
+
+token:      <TOKEN>
+
+
+==== local Access to the Dashboard ====
+
+```
+kubectl --kubeconfig ~/tools/pi-cluster/k3s/k3s.yaml proxy
+```
+
+==== The Dashboard is now accessible at: ====
+
+http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+Sign In with the admin-user Bearer Token
+
+
+Reference: https://rancher.com/docs/k3s/latest/en/installation/kube-dashboard/
+
+===== install unzip =====
+
+sudo apt-get install -y zip
+
+sudo apt-get install -y unzip
+
+===== install sdkman =====
+
+curl -s "https://get.sdkman.io" | bash -- install sdkman
+
+=== connect to cluster from local machine ===
+
+```
+sudo kubectl --kubeconfig ~/tools/pi-cluster/k3s/k3s.yaml get nodes
+```
+
+
+https://bryanbende.com/development/2021/05/07/k3s-raspberry-pi-initial-setup
+
+
+https://192.168.0.100:6443>/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
