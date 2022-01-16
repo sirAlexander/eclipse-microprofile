@@ -1,90 +1,6 @@
-== Tekton with ArgoCD
 
-=== Prerequisites
-1. install Istio
-2. Install Argo CD
-3. Install Tekton
 
-=== Create secrets for SSH GitHub
 
-This is one way to create a SSH key, that will be added to GitHub.
-
-----
-ssh-keygen -t rsa -b 4096 -C "tekton@shikanga.co.uk"
-# save as tekton / tekton.pub
-# add tekton.pub contents to GitHub
-----
-
-==== Create secret YAML from ssh key contents
-
-----
-cat tekton | base64 -w 0; echo
-----
-
-Followed by
-
-----
-cat > tekton-git-ssh-secret.yaml << EOM
-apiVersion: v1
-kind: Secret
-metadata:
-  name: git-ssh-key
-  namespace: tekton-pipelines
-  annotations:
-    tekton.dev/git-0: github.com
-type: kubernetes.io/ssh-auth
-data:
-  ssh-privatekey: <base64 data>
-EOM
-----
-
-Then execute
-
-----
-kubectl apply -f tekton-git-ssh-secret.yaml
-----
-
-=== Create secrets for Docker Registry
-
-----
-cat ~/.docker/config.json | base64 -w 0; echo
-----
-
-Followed by
-
-----
-cat > regsecret.yaml << EOM
-kind: Secret
-apiVersion: v1
-metadata:
-  name: regsecret
-data:
-  .dockercfg: <base 64 data>
-type: kubernetes.io/dockercfg
-EOM
-----
-
-Then execute
-
-----
-kubectl apply -n tekton-pipelines -f regsecret.yaml
-----
-
-Setup the Tekton serviceaccount:
-----
-kubectl apply -f tekton/
-----
-
-Create `systemtest` and `production` namespaces
-----
-kubectl apply -f namespaces/
-----
-
-create your Docker registry secret, for the newly created namespaces
-----
-kubectl apply -n systemtest -f regsecret.yaml
-kubectl apply -n production -f regsecret.yaml
-----
 
 == Download & Install Istio on the Raspberry Pi 4+
 
@@ -104,9 +20,7 @@ cd istio-1.12.1
 [start=3]
 . Add the istioctl client to your path (Linux or macOS):
 ----
-export PATH=$PWD/bin:$PATH
-
-export PATH=$PWD/tools/istio-1.12.1/bin:$PATH
+export PATH=$PATH:$HOME/tools/istio-1.12.1/bin
 ----
 
 [start=4]
@@ -135,6 +49,7 @@ kubectl patch deployments.apps \
   {"op": "replace", "path": "/spec/template/spec/affinity/nodeAffinity/requiredDuringSchedulingIgnoredDuringExecution/nodeSelectorTerms/0/matchExpressions/0/values", "value": [amd64,arm64,ppc64le,s390x]}
   ]'
 ----
+
 
 
 
@@ -179,5 +94,3 @@ curl -k -H "Content-Type: application/json" -X PUT --data-binary @tmp.json http:
  kubectl get namespaces
  ----
 
-
- kubectl create secret -n tekton-pipelines generic argocd-env-secret '--from-literal=ARGOCD_AUTH_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1ZGVhZmU3Yi1iNGEzLTRlODktOThmMC0wMGZkMjQ4ZGNlNzEiLCJpYXQiOjE2NDA3MDQ4MzEsImlzcyI6ImFyZ29jZCIsIm5iZiI6MTY0MDcwNDgzMSwic3ViIjoidGVrdG9uOmFwaUtleSJ9.vcWmO9hCkKznPOIWgRIx6oy2P-HPnvXccb8NroKoo7s'

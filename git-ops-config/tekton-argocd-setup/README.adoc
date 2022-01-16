@@ -1,0 +1,121 @@
+== Tekton with ArgoCD
+
+=== Prerequisites
+. install Istio - Reference: https://istio.io/latest/docs/setup/getting-started/
+. Install Argo CD - Reference: https://argo-cd.readthedocs.io/en/stable/getting_started/
+. Install Tekton - Reference: https://tekton.dev/docs/getting-started/
+.. Set up Tekton Triggers - Reference: https://tekton.dev/docs/triggers
+.. Install The Tekton Dashboard - Reference: https://tekton.dev/docs/dashboard
+
+
+=== Create secrets for SSH GitHub
+
+This is one way to create a SSH key, that will be added to GitHub.
+
+----
+ssh-keygen -t rsa -b 4096 -C "tekton@shikanga.co.uk"
+# save as tekton / tekton.pub
+# add tekton.pub contents to GitHub
+----
+
+==== Create secret YAML from ssh key contents
+
+----
+cat tekton | base64 -w 0; echo
+----
+
+Followed by
+
+----
+cat > tekton-git-ssh-secret.yaml << EOM
+apiVersion: v1
+kind: Secret
+metadata:
+  name: git-ssh-key
+  namespace: tekton-pipelines
+  annotations:
+    tekton.dev/git-0: github.com
+type: kubernetes.io/ssh-auth
+data:
+  ssh-privatekey: <base64 data>
+EOM
+----
+
+Then execute
+
+----
+kubectl apply -f tekton-git-ssh-secret.yaml
+----
+
+=== Create secrets for Docker Registry
+
+----
+cat ~/.docker/config.json | base64 -w 0; echo
+----
+
+Followed by
+
+----
+cat > regsecret.yaml << EOM
+kind: Secret
+apiVersion: v1
+metadata:
+  name: regsecret
+data:
+  .dockercfg: <base 64 data>
+type: kubernetes.io/dockercfg
+EOM
+----
+
+Then execute
+
+----
+kubectl apply -n tekton-pipelines -f regsecret.yaml
+----
+
+Setup the Tekton serviceaccount:
+----
+kubectl apply -f tekton/
+----
+
+Create `argocd`, `systemtest` and `production` namespaces
+----
+kubectl apply -f namespaces/
+----
+
+create your Docker registry secret, for the newly created namespaces, except the `argocd` namespace
+----
+kubectl apply -n systemtest -f regsecret.yaml
+kubectl apply -n production -f regsecret.yaml
+----
+
+== Configure ArgoCD
+
+----
+kubectl apply -f argocd/
+----
+
+Login in ArgoCD, find out the admin password and create a token:
+
+Use kubectl to retrieve the initial password:
+----
+# forward ports to access in browser
+kubectl port-forward -n argocd svc/argocd-server 9090:443
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+----
+
+Then login with the credentials, as shown below.
+----
+Username: admin
+password: <value-of-initial-password-from command-above>
+----
+
+
+== Create ArgoCD access with Tekton 
+
+Under https://localhost:9090/settings/accounts/tekton generate a token.
+
+----
+kubectl create secret -n tekton-pipelines generic argocd-env-secret '--from-literal=ARGOCD_AUTH_TOKEN=<token>'
+----
