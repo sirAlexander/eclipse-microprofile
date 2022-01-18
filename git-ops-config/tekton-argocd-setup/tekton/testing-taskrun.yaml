@@ -32,7 +32,7 @@ spec:
     - name: build-sources
       image: sdaschner/maven-jdk14:quarkus-deps-1.5.1-b5
       workingDir: "$(workspaces.app-source.path)/coffee-shop"
-      command: ["sleep", "infinity"]
+      command: ["echo", "Hello", "World"]
 
       # specify other specs, like in the regular task definitions
 
