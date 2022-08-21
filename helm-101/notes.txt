@@ -1,1 +1,2 @@
 1. Create Your First Helm Chart - Reference >> https://docs.bitnami.com/tutorials/create-your-first-helm-chart/
+2. Covered Topic around being production ready - Reference >> https://docs.bitnami.com/tutorials/the-road-to-production-ready-charts/
